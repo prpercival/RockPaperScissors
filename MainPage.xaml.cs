@@ -27,65 +27,13 @@ namespace RockPaperScissors
     /// </summary>
     public partial class MainPage : Page
     {
-        private GameTimer timer = new GameTimer();
-
         public MainPage()
         {
             ElementSoundPlayer.State = ElementSoundPlayerState.On;
             this.InitializeComponent();
-            this.Loaded += MainPage_Loaded;
             DataContext = this;
 
             Window.Current.CoreWindow.KeyDown += Window_KeyDown;
-        }
-
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
-        {
-            // Create some test pawns on the map.
-            var pawn1 = new Pawn(this.timer);
-            var pawn2 = new Pawn(this.timer);
-            var pawn3 = new Pawn(this.timer);
-            pawn1.Tapped += Pawn_Tapped;
-            pawn2.Tapped += Pawn_Tapped;
-            pawn3.Tapped += Pawn_Tapped;
-            pawn1.SetCanvasLocation(120, 120);
-            pawn2.SetCanvasLocation(160, 160);
-            pawn3.SetCanvasLocation(200, 200);
-            this.grid.Children.Add(pawn1);
-            this.grid.Children.Add(pawn2);
-            this.grid.Children.Add(pawn3);
-        }
-
-        private void Pawn_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            // Making sure the Map_Tapped event handler won't run.
-            e.Handled = true;
-
-            // Selecting the tapped pawn and unselecting the others.
-            foreach (Pawn pawn in this.grid.Children.OfType<Pawn>())
-            {
-                pawn.IsSelected = (pawn == sender);
-            }
-        }
-
-        private async void Map_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            // Get the selected pawn from the map.
-            try
-            {
-                if (this.grid.Children.FirstOrDefault(x => ((Pawn)x).IsSelected) is Pawn pawn)
-                {
-                    // Get nearest 40x40px grid destination and move there.
-                    var position = e.GetPosition(this.grid);
-                    var x = Math.Floor(position.X / 40.0) * 40.0;
-                    var y = Math.Floor(position.Y / 40.0) * 40.0;
-                    await pawn.MoveAsync(x, y);
-                }
-            }
-            catch(Exception ex)
-            {
-
-            }
         }
 
         // Property Change Logic
