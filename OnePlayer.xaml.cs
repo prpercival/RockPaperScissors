@@ -27,11 +27,11 @@ namespace RockPaperScissors
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public partial class RockPaperScissors : Page, INotifyPropertyChanged
+    public partial class OnePlayer : Page, INotifyPropertyChanged
     {
         public static string YourChoice;
 
-        public RockPaperScissors()
+        public OnePlayer()
         {
             Title = "Choose your move!";
 

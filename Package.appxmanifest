@@ -4,18 +4,19 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  IgnorableNamespaces="uap mp">
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  IgnorableNamespaces="uap mp desktop4">
 
   <Identity
-    Name="b33513be-2ed2-4b4b-8eca-6a8a3e1176cd"
-    Publisher="CN=Preston"
-    Version="1.1.0.0" />
+    Name="15573PrestonPercival.RockPaperScissorsMoo"
+    Publisher="CN=9E9B7413-AC65-411D-B6DF-92861B9BB33D"
+    Version="1.1.7.0" />
 
-  <mp:PhoneIdentity PhoneProductId="b33513be-2ed2-4b4b-8eca-6a8a3e1176cd" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="f1d6b794-1ab7-401f-87ce-01c14544eaf8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>RockPaperScissors</DisplayName>
-    <PublisherDisplayName>Preston</PublisherDisplayName>
+    <DisplayName>Rock, Paper, Scissors, Moo</DisplayName>
+    <PublisherDisplayName>Preston Percival</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -30,20 +31,25 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="RockPaperScissors.App">
+      EntryPoint="RockPaperScissors.App"
+      desktop4:SupportsMultipleInstances="true">
       <uap:VisualElements
-        DisplayName="RockPaperScissors"
+        DisplayName="Rock, Paper, Scissors, Moo"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="RockPaperScissors"
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png" ShortName="RockPaperScissorsMoo">
+        </uap:DefaultTile >
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>
 
   <Capabilities>
     <Capability Name="internetClient" />
+    <uap:Capability Name="sharedUserCertificates"/>
   </Capabilities>
 </Package>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xbox.Services.System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -6,9 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.System;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -27,14 +30,30 @@ namespace RockPaperScissors
     /// </summary>
     public partial class MainPage : Page
     {
+        public static User User { get; set; }
+
+        public static string UserKey = Guid.NewGuid().ToString();
+
         public MainPage()
         {
             ElementSoundPlayer.State = ElementSoundPlayerState.On;
             this.InitializeComponent();
             DataContext = this;
 
+            User = new User() { Id = UserKey };
+
             Window.Current.CoreWindow.KeyDown += Window_KeyDown;
         }
+
+        //public async void GetUser()
+        //{
+        //    XboxLiveUser user = new XboxLiveUser();
+        //    SignInResult result = await user.SignInSilentlyAsync(Window.Current.Dispatcher);
+        //    if (result.Status == SignInStatus.UserInteractionRequired)
+        //    {
+        //        result = await user.SignInAsync(Window.Current.Dispatcher);
+        //    }
+        //}
 
         // Property Change Logic
         public event PropertyChangedEventHandler PropertyChanged;
@@ -54,9 +73,33 @@ namespace RockPaperScissors
                 eventHandler(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void One_Player(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(RockPaperScissors));
+            this.Frame.Navigate(typeof(OnePlayer));
+        }
+
+        private async void Two_Player(object sender, RoutedEventArgs e)
+        {      
+            string name = await InputTextDialogAsync("Please Enter Your Name");
+
+            this.Frame.Navigate(typeof(OnlineSearch), name);
+        }
+
+        private async Task<string> InputTextDialogAsync(string title)
+        {
+            TextBox inputTextBox = new TextBox();
+            inputTextBox.AcceptsReturn = false;
+            inputTextBox.Height = 32;
+            ContentDialog dialog = new ContentDialog();
+            dialog.Content = inputTextBox;
+            dialog.Title = title;
+            dialog.IsSecondaryButtonEnabled = true;
+            dialog.PrimaryButtonText = "Ok";
+            dialog.SecondaryButtonText = "Cancel";
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                return inputTextBox.Text;
+            else
+                return "";
         }
 
         private double Mod(double k, double n) { return ((k %= n) < 0) ? k + n : k; }

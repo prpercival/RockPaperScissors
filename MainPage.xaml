@@ -23,7 +23,8 @@
             <RowDefinition Height="20*" />
             <RowDefinition Height="20*" />
         </Grid.RowDefinitions>
-        <Button x:Name="button" Content="Start Game" Grid.Column="2" Grid.Row="3" VerticalAlignment="Bottom" FontSize="40%" HorizontalAlignment="Center" Height="100" Width="275" Click="Button_Click"/>
+        <Button x:Name="OnePlayer" Content="One Player" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Bottom" FontSize="40%" HorizontalAlignment="Center" Height="100" Width="275" Click="One_Player"/>
+        <Button x:Name="TwoPlayer" Content="Two Player" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Bottom" FontSize="40%" HorizontalAlignment="Center" Height="100" Width="275" Click="Two_Player"/>
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Grid.Column="1" Grid.Row="0">
             <TextBlock TextWrapping="Wrap" Text="Rock, Paper, Scissors" />
         </Viewbox>
