@@ -12,7 +12,18 @@ namespace RockPaperScissors
 
         public Guid Id { get; set; }
 
-        public Dictionary<string, User> Users { get; set; }
+        private Dictionary<string, User> _users;
+
+        public Dictionary<string, User> Users
+        {
+            get { return _users; }
+            set
+            {
+                _users = value;
+                if(value != null)
+                    Size = value.Count;
+            }
+        }
 
         private int _size;
 

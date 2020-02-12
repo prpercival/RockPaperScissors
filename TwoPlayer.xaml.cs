@@ -82,10 +82,14 @@ namespace RockPaperScissors
             }
         }
 
-        HttpClient client = new HttpClient();
+        HttpClient client;
 
         public TwoPlayer()
         {
+            var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            client = new HttpClient(httpClientHandler);
+
             Title = "Waiting for opponent to join...";
             Opponent = OnlineSearch.Lobby.Users.Where(x => x.Key != MainPage.UserKey).FirstOrDefault().Value;
             User = MainPage.User;
@@ -178,13 +182,13 @@ namespace RockPaperScissors
 
         private async void WaitForOpponent()
         {
-            while(OnlineSearch.Lobby.Users.Count < 2)
+            while(OnlineSearch.Lobby != null && OnlineSearch.Lobby.Users.Count < 2)
             {
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(OnlineSearch.Lobby);
 
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync($"https://localhost:5001/api/search/getlobby", data);
+                var response = await client.PostAsync($"{MainPage.endpoint}/api/search/getlobby", data);
 
                 data.Dispose();
 
@@ -193,6 +197,9 @@ namespace RockPaperScissors
                 var lobby = Newtonsoft.Json.JsonConvert.DeserializeObject<Lobby>(results);
 
                 OnlineSearch.Lobby = lobby;
+
+                if (lobby == null)
+                    return;
 
                 Opponent = OnlineSearch.Lobby.Users.Where(x => x.Key != MainPage.UserKey).FirstOrDefault().Value;
 
@@ -212,7 +219,7 @@ namespace RockPaperScissors
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("https://localhost:5001/api/search/shoot", data);
+            var response = await client.PostAsync($"{MainPage.endpoint}/api/search/shoot", data);
 
             data.Dispose();
 
@@ -233,13 +240,16 @@ namespace RockPaperScissors
 
                 data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                response = await client.PostAsync("https://localhost:5001/api/search/shoot", data);
+                response = await client.PostAsync($"{MainPage.endpoint}/api/search/shoot", data);
 
                 data.Dispose();
 
                 httpData = await response.Content.ReadAsStringAsync();
 
                 lobby = Newtonsoft.Json.JsonConvert.DeserializeObject<Lobby>(httpData);
+
+                if (lobby == null)
+                    return;
              
                 isReady = lobby.Users.All(x => x.Value.Choice != null) && lobby.Users.Count > 1;
 
@@ -267,7 +277,7 @@ namespace RockPaperScissors
 
             data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            response = await client.PostAsync("https://localhost:5001/api/search/reset", data);
+            response = await client.PostAsync($"{MainPage.endpoint}/api/search/reset", data);
 
             httpData = await response.Content.ReadAsStringAsync();
 
@@ -349,7 +359,7 @@ namespace RockPaperScissors
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync($"https://localhost:5001/api/search/leavelobby?lobbyId={OnlineSearch.Lobby.Id}", data);
+            var response = await client.PostAsync($"{MainPage.endpoint}/api/search/leavelobby?lobbyId={OnlineSearch.Lobby.Id}", data);
 
             OnlineSearch.Lobby = null;
 

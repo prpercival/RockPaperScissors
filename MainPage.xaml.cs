@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -34,8 +35,13 @@ namespace RockPaperScissors
 
         public static string UserKey = Guid.NewGuid().ToString();
 
+        public static string endpoint = "https://75.7.110.224:45146";
+
         public MainPage()
         {
+            if (Debugger.IsAttached)
+                endpoint = "https://75.7.110.224:45146";
+
             ElementSoundPlayer.State = ElementSoundPlayerState.On;
             this.InitializeComponent();
             DataContext = this;
@@ -82,7 +88,24 @@ namespace RockPaperScissors
         {      
             string name = await InputTextDialogAsync("Please Enter Your Name");
 
+            if (name == null)
+            {
+                NotificationModal("No name entered", "Please enter a name");
+                return;
+            }
+
             this.Frame.Navigate(typeof(OnlineSearch), name);
+        }
+
+        private async void NotificationModal(string title, string content)
+        {
+            ContentDialog dialog = new ContentDialog();
+            dialog.Content = content;
+            dialog.Title = title;
+            dialog.PrimaryButtonText = "Ok";
+            dialog.SecondaryButtonText = "Cancel";
+            await dialog.ShowAsync();
+            return;
         }
 
         private async Task<string> InputTextDialogAsync(string title)

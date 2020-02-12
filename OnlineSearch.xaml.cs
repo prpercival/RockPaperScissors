@@ -47,21 +47,50 @@ namespace RockPaperScissors
             set { this.SetProperty(ref this._lobbies, value); }
         }
 
-        HttpClient client = new HttpClient();
+        private bool _hadTwoPlayers = false;
+
+        HttpClient client;
 
         public OnlineSearch()
         {
+            var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            client = new HttpClient(httpClientHandler);
+
             this.InitializeComponent();
             DataContext = this;
 
-            PopulateLobbies();
+            PopulateLobbies();        
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private async Task<string> InputTextDialogAsync(string title)
+        {
+            TextBox inputTextBox = new TextBox();
+            inputTextBox.AcceptsReturn = false;
+            inputTextBox.Height = 32;
+            ContentDialog dialog = new ContentDialog();
+            dialog.Content = inputTextBox;
+            dialog.Title = title;
+            dialog.IsSecondaryButtonEnabled = true;
+            dialog.PrimaryButtonText = "Ok";
+            dialog.SecondaryButtonText = "Cancel";
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                return inputTextBox.Text;
+            }
+            else
+            {
+                this.Frame.Navigate(typeof(MainPage));
+                return "";
+            }
+        }
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             AccountName = e.Parameter.ToString();
+
             MainPage.User.Name = AccountName;
 
             Console.WriteLine(e.Parameter.ToString());
@@ -86,7 +115,7 @@ namespace RockPaperScissors
 
         public async void PopulateLobbies()
         {
-            var response = await client.GetAsync("https://localhost:5001/api/search/getlobbies");
+            var response = await client.GetAsync($"{MainPage.endpoint}/api/search/getlobbies");
             var data = await response.Content.ReadAsStringAsync();
 
             var lobbies = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<Lobby>>(data);
@@ -96,7 +125,20 @@ namespace RockPaperScissors
 
         private async void Join_Click(object sender, RoutedEventArgs e)
         {
-            var choice = (Lobby) this.listView.SelectedItem;
+            var choice = (Lobby)this.listView.SelectedItem;
+
+            if(choice == null)
+            {
+                NotificationModal("No lobby selected", "Please choose a lobby");
+                return;
+            }
+
+            if (choice.Size >= 2)
+            {
+                NotificationModal("Lobby is full", "Please select another lobby");
+                return;
+            }
+
             choice.Users.Add(MainPage.UserKey, MainPage.User);
             if (choice.Size < 2)
             {
@@ -104,7 +146,7 @@ namespace RockPaperScissors
 
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync($"https://localhost:5001/api/search/joinlobby?userId={MainPage.UserKey}", data);
+                var response = await client.PostAsync($"{MainPage.endpoint}/api/search/joinlobby?userId={MainPage.UserKey}", data);
 
                 data.Dispose();
 
@@ -112,9 +154,30 @@ namespace RockPaperScissors
 
                 var lobby = Newtonsoft.Json.JsonConvert.DeserializeObject<Lobby>(results);
 
+                if(lobby == null)
+                {
+                    NotificationModal("Lobby is full or no longer exists", "Please select another lobby");
+                    PopulateLobbies();
+                    return;
+                }
+
                 Lobby = lobby;
+
+                var t = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => HeartBeat());
+
                 this.Frame.Navigate(typeof(TwoPlayer));
             }
+        }
+
+        private async void NotificationModal(string title, string content)
+        {
+            ContentDialog dialog = new ContentDialog();
+            dialog.Content = content;
+            dialog.Title = title;
+            dialog.PrimaryButtonText = "Ok";
+            dialog.SecondaryButtonText = "Cancel";
+            await dialog.ShowAsync();
+            return;
         }
 
         private async void Create_Click(object sender, RoutedEventArgs e)
@@ -125,7 +188,7 @@ namespace RockPaperScissors
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("https://localhost:5001/api/search/addlobby", data);
+            var response = await client.PostAsync($"{MainPage.endpoint}/api/search/addlobby", data);
 
             data.Dispose();
 
@@ -140,16 +203,34 @@ namespace RockPaperScissors
 
             Lobby = lobbies.Where(x => x.Users.ContainsKey(user.Id)).FirstOrDefault();
 
-            var t = Task.Run(() => HeartBeat());
+            var t = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => HeartBeat());
 
             this.Frame.Navigate(typeof(TwoPlayer));
         }
 
         public async void HeartBeat()
         {
-            while(Lobby != null)
+            while (Lobby != null)
             {
-                var response = await client.PostAsync($"https://localhost:5001/api/search/heartbeat?userId={MainPage.User.Id}", null);
+                var response = await client.PostAsync($"{MainPage.endpoint}/api/search/heartbeat?userId={MainPage.User.Id}", null);
+
+                var results = await response.Content.ReadAsStringAsync();
+
+                var lobby = Newtonsoft.Json.JsonConvert.DeserializeObject<Lobby>(results);
+                lobby.Size = lobby.Users.Count;
+
+                if(lobby.Size > 1)
+                {
+                    _hadTwoPlayers = true;
+                }
+
+                if(_hadTwoPlayers == true && lobby.Size < 2)
+                {
+                    _hadTwoPlayers = false;
+                    NotificationModal("Opponent has left...", "Returning to main menu");
+                    this.Frame.Navigate(typeof(MainPage));
+                    return;
+                }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
             }

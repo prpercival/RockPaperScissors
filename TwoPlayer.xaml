@@ -39,7 +39,7 @@
             <TextBlock TextWrapping="Wrap" Text="{Binding Opponent.Name, Mode=TwoWay}" />
         </Viewbox>
         <!--<TextBlock x:Name="textBox" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Grid.Column="1" Grid.Row="0" FontSize="100%" Text="{Binding Title, Mode=TwoWay}" Height="120" Width="454"/>-->
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.RowSpan="3" Grid.Row="1">
             <RadioButton FontSize="35%" Content="Rock" Tag="Rock" Checked="BGRadioButton_Checked" IsChecked="True" ElementSoundMode="Off"/>
             <RadioButton FontSize="35%" Content="Paper" Tag="Paper" Checked="BGRadioButton_Checked" ElementSoundMode="Off"/>
             <RadioButton FontSize="35%" Content="Scissors" Tag="Scissors" Checked="BGRadioButton_Checked" ElementSoundMode="Off"/>
