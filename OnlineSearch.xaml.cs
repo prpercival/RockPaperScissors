@@ -63,29 +63,29 @@ namespace RockPaperScissors
             PopulateLobbies();        
         }
 
-        private async Task<string> InputTextDialogAsync(string title)
-        {
-            TextBox inputTextBox = new TextBox();
-            inputTextBox.AcceptsReturn = false;
-            inputTextBox.Height = 32;
-            ContentDialog dialog = new ContentDialog();
-            dialog.Content = inputTextBox;
-            dialog.Title = title;
-            dialog.IsSecondaryButtonEnabled = true;
-            dialog.PrimaryButtonText = "Ok";
-            dialog.SecondaryButtonText = "Cancel";
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-            {
-                return inputTextBox.Text;
-            }
-            else
-            {
-                this.Frame.Navigate(typeof(MainPage));
-                return "";
-            }
-        }
+        //private async Task<string> InputTextDialogAsync(string title)
+        //{
+        //    TextBox inputTextBox = new TextBox();
+        //    inputTextBox.AcceptsReturn = false;
+        //    inputTextBox.Height = 32;
+        //    ContentDialog dialog = new ContentDialog();
+        //    dialog.Content = inputTextBox;
+        //    dialog.Title = title;
+        //    dialog.IsSecondaryButtonEnabled = true;
+        //    dialog.PrimaryButtonText = "Ok";
+        //    dialog.SecondaryButtonText = "Cancel";
+        //    if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        //    {
+        //        return inputTextBox.Text;
+        //    }
+        //    else
+        //    {
+        //        this.Frame.Navigate(typeof(MainPage));
+        //        return "";
+        //    }
+        //}
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
@@ -102,11 +102,11 @@ namespace RockPaperScissors
         {
             if (object.Equals(storage, value)) return false;
             storage = value;
-            this.OnPropertyChaned(propertyName);
+            this.OnPropertyChanged(propertyName);
             return true;
         }
 
-        private void OnPropertyChaned(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             var eventHandler = this.PropertyChanged;
             if (eventHandler != null)
@@ -115,12 +115,24 @@ namespace RockPaperScissors
 
         public async void PopulateLobbies()
         {
-            var response = await client.GetAsync($"{MainPage.endpoint}/api/search/getlobbies");
-            var data = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var response = await client.GetAsync($"{MainPage.endpoint}/api/search/getlobbies");
+                var data = await response.Content.ReadAsStringAsync();
 
-            var lobbies = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<Lobby>>(data);
+                var lobbies = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<Lobby>>(data);
 
-            Lobbies = lobbies;
+                Lobbies = lobbies;
+            }
+            catch(Exception ex)
+            {
+                NotificationModal("Error connecting to server, returning to main menu", ex.ToString());
+                Lobbies = null;
+                Lobby = null;
+                AccountName = null;
+                _hadTwoPlayers = false;
+                this.Frame.Navigate(typeof(MainPage));
+            }
         }
 
         private async void Join_Click(object sender, RoutedEventArgs e)

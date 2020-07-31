@@ -10,7 +10,7 @@
   <Identity
     Name="15573PrestonPercival.RockPaperScissorsMoo"
     Publisher="CN=9E9B7413-AC65-411D-B6DF-92861B9BB33D"
-    Version="1.1.7.0" />
+    Version="1.1.13.0" />
 
   <mp:PhoneIdentity PhoneProductId="f1d6b794-1ab7-401f-87ce-01c14544eaf8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -50,6 +50,5 @@
 
   <Capabilities>
     <Capability Name="internetClient" />
-    <uap:Capability Name="sharedUserCertificates"/>
   </Capabilities>
 </Package>

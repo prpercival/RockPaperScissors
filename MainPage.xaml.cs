@@ -85,12 +85,16 @@ namespace RockPaperScissors
         }
 
         private async void Two_Player(object sender, RoutedEventArgs e)
-        {      
+        {
             string name = await InputTextDialogAsync("Please Enter Your Name");
 
-            if (name == null)
+            if (string.IsNullOrWhiteSpace(name))
             {
                 NotificationModal("No name entered", "Please enter a name");
+                return;
+            }
+            else if(name == "returning")
+            {
                 return;
             }
 
@@ -119,10 +123,14 @@ namespace RockPaperScissors
             dialog.IsSecondaryButtonEnabled = true;
             dialog.PrimaryButtonText = "Ok";
             dialog.SecondaryButtonText = "Cancel";
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Secondary)
+                return "returning";
+            else if (result == ContentDialogResult.Primary)
                 return inputTextBox.Text;
             else
-                return "";
+                return null;
         }
 
         private double Mod(double k, double n) { return ((k %= n) < 0) ? k + n : k; }

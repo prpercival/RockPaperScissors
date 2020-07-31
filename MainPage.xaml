@@ -11,26 +11,30 @@
     <Grid x:Name="grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="20*" />
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
             <ColumnDefinition Width="20*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*" />
             <RowDefinition Height="20*" />
             <RowDefinition Height="20*" />
-            <RowDefinition Height="20*" />
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="10*" />
             <RowDefinition Height="20*" />
         </Grid.RowDefinitions>
-        <Button x:Name="OnePlayer" Content="One Player" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Bottom" FontSize="40%" HorizontalAlignment="Center" Height="100" Width="275" Click="One_Player"/>
-        <Button x:Name="TwoPlayer" Content="Two Player" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Bottom" FontSize="40%" HorizontalAlignment="Center" Height="100" Width="275" Click="Two_Player"/>
-        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Grid.Column="1" Grid.Row="0">
+        <Button x:Name="OnePlayer" Content="One Player" Grid.Column="2" Margin="5" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Stretch" FontSize="40%" HorizontalAlignment="Stretch" Click="One_Player"/>
+        <Button x:Name="TwoPlayer" Content="Two Player" Grid.Column="4" Margin="5" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="Stretch" FontSize="40%" HorizontalAlignment="Stretch" Click="Two_Player"/>
+        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.ColumnSpan="6" Grid.Column="1" Grid.Row="0">
             <TextBlock TextWrapping="Wrap" Text="Rock, Paper, Scissors" />
         </Viewbox>
-        <Image Source="ms-appx:///Assets/rock.png" x:Name="rock" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2"/>
-        <Image Source="ms-appx:///Assets/paper.png" x:Name="paper" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2"/>
-        <Image Source="ms-appx:///Assets/scissors.png" x:Name="scissors" Grid.Column="3" Grid.Row="1" Grid.RowSpan="2"/>
+        <Image Source="ms-appx:///Assets/rock.png" x:Name="rock" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="2"/>
+        <Image Source="ms-appx:///Assets/paper.png" x:Name="paper" Grid.Column="3" Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="2"/>
+        <Image Source="ms-appx:///Assets/scissors.png" x:Name="scissors" Grid.Column="5" Grid.ColumnSpan="2" Grid.Row="1" Grid.RowSpan="2"/>
     </Grid>
     
     

@@ -31,7 +31,7 @@ namespace RockPaperScissors
     /// </summary>
     public partial class TwoPlayer : Page, INotifyPropertyChanged
     {
-        public static Choice YourChoice;
+        private static Choice _yourChoice;
 
         private User _user;
 
@@ -158,9 +158,9 @@ namespace RockPaperScissors
             {
                 string choice = rb.Tag.ToString();
 
-                Enum.TryParse<Choice>(choice, out YourChoice);
+                Enum.TryParse(choice, out _yourChoice);
 
-                switch (YourChoice)
+                switch (_yourChoice)
                 {
                     case Choice.Rock:
                         ImagePath = @"ms-appx:///Assets/rock.png";
@@ -178,7 +178,7 @@ namespace RockPaperScissors
             }
         }
 
-        private Dictionary<int, string> _choices = new Dictionary<int, string>() { { 1, "rock" }, { 2, "paper" }, { 3, "scissors" } };
+        //private Dictionary<int, string> _choices = new Dictionary<int, string>() { { 1, "rock" }, { 2, "paper" }, { 3, "scissors" } };
 
         private async void WaitForOpponent()
         {
@@ -186,11 +186,9 @@ namespace RockPaperScissors
             {
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(OnlineSearch.Lobby);
 
-                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                using var data = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await client.PostAsync($"{MainPage.endpoint}/api/search/getlobby", data);
-
-                data.Dispose();
 
                 var results = await response.Content.ReadAsStringAsync();
 
@@ -213,7 +211,7 @@ namespace RockPaperScissors
         {
             var user = MainPage.User;
 
-            user.Choice = YourChoice;
+            user.Choice = _yourChoice;
 
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(user);
 
@@ -307,7 +305,7 @@ namespace RockPaperScissors
                     break;
             }
 
-            if ((YourChoice == Choice.Rock && choice == Choice.Scissors) || (YourChoice == Choice.Scissors && choice == Choice.Paper) || (YourChoice == Choice.Paper && choice == Choice.Rock))
+            if ((_yourChoice == Choice.Rock && choice == Choice.Scissors) || (_yourChoice == Choice.Scissors && choice == Choice.Paper) || (_yourChoice == Choice.Paper && choice == Choice.Rock))
             {
                 MyScore++;
                 Score = $"{MyScore} - {OpponentScore}";
@@ -321,7 +319,7 @@ namespace RockPaperScissors
                 mysong.SetSource(stream, file.ContentType);
                 mysong.Play();
             }
-            else if (YourChoice == Choice.Moo || choice == Choice.Moo)
+            else if (_yourChoice == Choice.Moo || choice == Choice.Moo)
             {
                 OpponentImagePath = @"ms-appx:///Assets/moo.png";
                 Title = "MOOOOOOOOOOOOO!";
@@ -333,7 +331,7 @@ namespace RockPaperScissors
                 mysong.SetSource(stream, file.ContentType);
                 mysong.Play();
             }
-            else if (YourChoice == choice)
+            else if (_yourChoice == choice)
             {
                 Title = "You tied, try again!";
             }           
@@ -357,7 +355,7 @@ namespace RockPaperScissors
         {
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(MainPage.User);
 
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            using var data = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync($"{MainPage.endpoint}/api/search/leavelobby?lobbyId={OnlineSearch.Lobby.Id}", data);
 

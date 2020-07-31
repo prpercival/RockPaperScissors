@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -29,7 +30,7 @@ namespace RockPaperScissors
     /// </summary>
     public partial class OnePlayer : Page, INotifyPropertyChanged
     {
-        public static string YourChoice;
+        private static Choice _yourChoice;
 
         public OnePlayer()
         {
@@ -73,11 +74,11 @@ namespace RockPaperScissors
         {
             if (object.Equals(storage, value)) return false;
             storage = value;
-            this.OnPropertyChaned(propertyName);
+            this.OnPropertyChanged(propertyName);
             return true;
         }
 
-        private void OnPropertyChaned(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
             var eventHandler = this.PropertyChanged;
             if (eventHandler != null)
@@ -94,27 +95,27 @@ namespace RockPaperScissors
             {
                 string choice = rb.Tag.ToString();
 
-                YourChoice = choice.ToLower();
+                Enum.TryParse(choice, out _yourChoice);
 
-                switch (choice)
+                switch (_yourChoice)
                 {
-                    case "Rock":
+                    case Choice.Rock:
                         ImagePath = @"ms-appx:///Assets/rock.png";
                         break;
-                    case "Paper":
+                    case Choice.Paper:
                         ImagePath = @"ms-appx:///Assets/paper.png";
                         break;
-                    case "Scissors":
+                    case Choice.Scissors:
                         ImagePath = @"ms-appx:///Assets/scissors.png";
                         break;
-                    case "Moo":
+                    case Choice.Moo:
                         ImagePath = @"ms-appx:///Assets/moo.png";
                         break;
                 }
             }
         }
 
-        private Dictionary<int, string> _choices = new Dictionary<int, string>() { { 1, "rock" }, { 2, "paper" }, { 3, "scissors" } };
+        private Dictionary<int, string> _choices = new Dictionary<int, string>() { { 1, "Rock" }, { 2, "Paper" }, { 3, "Scissors" } };
 
         private async void Shoot_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -132,25 +133,27 @@ namespace RockPaperScissors
 
             var randNumber = new Random().Next(1, 4);
 
-            _choices.TryGetValue(randNumber, out var choice);
+            _choices.TryGetValue(randNumber, out var choiceString);
+
+            Enum.TryParse<Choice>(choiceString, out var choice);
 
             switch (choice)
             {
-                case "rock":
+                case Choice.Rock:
                     OpponentImagePath = @"ms-appx:///Assets/rock.png";
                     break;
-                case "paper":
+                case Choice.Paper:
                     OpponentImagePath = @"ms-appx:///Assets/paper.png";
                     break;
-                case "scissors":
+                case Choice.Scissors:
                     OpponentImagePath = @"ms-appx:///Assets/scissors.png";
                     break;
-                case "moo":
+                case Choice.Moo:
                     OpponentImagePath = @"ms-appx:///Assets/moo.png";
                     break;
             }
 
-            if ((YourChoice == "rock" && choice == "scissors") || (YourChoice == "scissors" && choice == "paper") || (YourChoice == "paper" && choice == "rock"))
+            if ((_yourChoice.Equals(Choice.Rock) && choice.Equals(Choice.Scissors)) || (_yourChoice.Equals(Choice.Scissors) && choice.Equals(Choice.Paper)) || (_yourChoice.Equals(Choice.Paper) && choice.Equals(Choice.Rock)))
             {
                 Title = "You Win!";
 
@@ -161,11 +164,11 @@ namespace RockPaperScissors
                 mysong.SetSource(stream, file.ContentType);
                 mysong.Play();
             }
-            else if (YourChoice == choice)
+            else if (_yourChoice == choice)
             {
                 Title = "You tied, try again!";
             }
-            else if(YourChoice == "moo")
+            else if(_yourChoice.Equals(Choice.Moo))
             {
                 OpponentImagePath = @"ms-appx:///Assets/moo.png";
                 Title = "MOOOOOOOOOOOOO!";
